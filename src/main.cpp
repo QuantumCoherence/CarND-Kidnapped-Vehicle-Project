@@ -42,7 +42,10 @@ int main()
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
-
+  std::cout << "MAP " << std::endl;
+  for (unsigned int l=0;l<map.landmark_list.size();l++){
+	std::cout << "ID " << map.landmark_list[l].id_i << "\tX " << map.landmark_list[l].x_f << "\tY " << map.landmark_list[l].y_f << std::endl;
+  }
   // Create particle filter
   ParticleFilter pf;
 
@@ -102,7 +105,7 @@ int main()
         	std::istream_iterator<float>(),
         	std::back_inserter(y_sense));
 
-        	for(int i = 0; i < x_sense.size(); i++)
+        	for(unsigned int i = 0; i < x_sense.size(); i++)
         	{
         		LandmarkObs obs;
         		obs.x = x_sense[i];

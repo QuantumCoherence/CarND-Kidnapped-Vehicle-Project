@@ -10,6 +10,8 @@
 #define PARTICLE_FILTER_H_
 
 #include "helper_functions.h"
+#include "Eigen/Dense"
+using Eigen::MatrixXd;
 
 struct Particle {
 
@@ -18,6 +20,7 @@ struct Particle {
 	double y;
 	double theta;
 	double weight;
+	unsigned int landmark_count;
 	std::vector<int> associations;
 	std::vector<double> sense_x;
 	std::vector<double> sense_y;
@@ -42,7 +45,7 @@ public:
 	
 	// Set of current particles
 	std::vector<Particle> particles;
-
+	std::vector<Particle> resampled_particles;
 	// Constructor
 	// @param num_particles Number of particles
 	ParticleFilter() : num_particles(0), is_initialized(false) {}
@@ -115,6 +118,11 @@ public:
 	const bool initialized() const {
 		return is_initialized;
 	}
+private:
+	unsigned int this_part;
+	void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove);
+	void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove);
+
 };
 
 
