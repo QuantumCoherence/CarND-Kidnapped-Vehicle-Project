@@ -42,10 +42,6 @@ int main()
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
-  std::cout << "MAP " << std::endl;
-  for (unsigned int l=0;l<map.landmark_list.size();l++){
-	std::cout << "ID " << map.landmark_list[l].id_i << "\tX " << map.landmark_list[l].x_f << "\tY " << map.landmark_list[l].y_f << std::endl;
-  }
   // Create particle filter
   ParticleFilter pf;
 
@@ -130,8 +126,13 @@ int main()
 			}
 			weight_sum += particles[i].weight;
 		  }
-		  cout << "highest w " << highest_weight << endl;
-		  cout << "average w " << weight_sum/num_particles << endl;
+		  //cout << "highest w " << highest_weight << endl;
+		  //cout << "average w " << weight_sum/num_particles << endl;
+
+		 if (weight_sum/num_particles < 1.0e-4){
+			  pf.scramble(best_particle.x, best_particle.y, best_particle.theta, sigma_pos);
+
+		  }
 
           json msgJson;
           msgJson["best_particle_x"] = best_particle.x;

@@ -73,6 +73,8 @@ public:
 	 * @param velocity Velocity of car from t to t+1 [m/s]
 	 * @param yaw_rate Yaw rate of car from t to t+1 [rad/s]
 	 */
+	void scramble(double x, double y, double theta, double std[]);
+
 	void prediction(double delta_t, double std_pos[], double velocity, double yaw_rate);
 	
 	/**
@@ -118,11 +120,12 @@ public:
 	const bool initialized() const {
 		return is_initialized;
 	}
+	void printParticles();
 private:
 	unsigned int this_part;
 	void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove);
 	void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove);
-
+	std::vector<double> theta_dist;
 };
 
 
