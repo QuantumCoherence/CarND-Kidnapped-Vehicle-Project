@@ -25,7 +25,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1. 
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-	if (num_particles == 0) num_particles = 75;
+	if (num_particles == 0) num_particles = 50;
 	weights.resize(num_particles, 1.0);
 	theta_dist.resize(num_particles, 1.0);
 
@@ -83,9 +83,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 	default_random_engine gen;
 
-	// This line creates a normal (Gaussian) distribution for velocity and yaw_rate
 	normal_distribution<double> dist_x(0, std_pos[0]);
-	normal_distribution<double> dist_y(0, std_pos[1]);
+	//normal_distribution<double> dist_y(0, std_pos[1]);
 	normal_distribution<double> dist_theta(0, std_pos[2]);
 
 
@@ -100,7 +99,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].theta;
 		}
 		particles[i].x += dist_x(gen);
-		particles[i].y += dist_y(gen);
+		particles[i].y += dist_x(gen); // same noise density as x_
 		particles[i].theta += dist_theta(gen);
 
 	}
@@ -119,8 +118,6 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 		particles[this_part].sense_x.resize(obsvs);
 		particles[this_part].sense_y.resize(obsvs);
 	}
-	std::vector<LandmarkObs> loc_observations(obsvs);
-	loc_observations=observations;
 	unsigned int landmks = predicted.size();
 	MatrixXd distances = MatrixXd(obsvs, landmks);
 	// Fill in matrix with observations to landmarks distances
@@ -130,19 +127,17 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 		}
 	}
 	// find smallest element in matrix >> its matrix indexes are the closest observation-to-landmark pair
-	// delete row and column,>> start over until no more landmarks or observations are left, which ever comes first
-	unsigned int links;
+	// overwrite the columna dn row with large value
+	unsigned int links; // Stop when all landmarks have been processed
 	if (landmks < obsvs) {links =landmks; } else {links =obsvs; }
 	for (unsigned int i=0;i<links;i++) {
 		distances.minCoeff(&row, &col);
 		particles[this_part].associations[i] = predicted[col].id;
-		particles[this_part].sense_x[i] = loc_observations[row].x;
-		particles[this_part].sense_y[i] = loc_observations[row].y;
+		particles[this_part].sense_x[i] = observations[row].x;
+		particles[this_part].sense_y[i] = observations[row].y;
 		particles[this_part].landmark_count = i+1;
-		removeRow(distances, row);
-		removeColumn(distances, col);
-		loc_observations.erase (loc_observations.begin()+row);
-		predicted.erase (predicted.begin()+col);
+		distances.col(col).setConstant(100.0);
+		distances.row(row).setConstant(100.0);
 	}
 }
 
@@ -208,17 +203,17 @@ void ParticleFilter::resample() {
 	random_device rd;     // only used once to initialise (seed) engine
 	mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
 	// normalize weights for discrete distribution
-	double norm = 0.0;
+/*	double norm = 0.0;
 	for (int i=0; i<num_particles;i++){
 		norm += weights[i];
 	}
 	for (int i=0; i<num_particles;i++){
 			weights[i] /= norm;
-	}
+	}*/
 	std::discrete_distribution<int> ddist(weights.begin(), weights.end());
 
 	int index;
-	// resample using discrete distribution based on normlaized weights
+	// resample using discrete distribution
 	for (int i=0; i<num_particles ;i++){
 		index = ddist(rng);
 		resampled_particles[i] = particles[index];
