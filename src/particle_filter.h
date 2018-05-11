@@ -11,6 +11,7 @@
 
 #include "helper_functions.h"
 #include "Eigen/Dense"
+
 using Eigen::MatrixXd;
 
 struct Particle {
@@ -126,6 +127,7 @@ private:
 	void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove);
 	void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove);
 	std::vector<double> theta_dist;
+
 };
 
 

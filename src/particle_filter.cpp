@@ -59,14 +59,14 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 }
 
 void ParticleFilter::scramble(double x, double y, double theta, double std[]) {
-	default_random_engine gen;
+	//default_random_engine gen;
 
 	// This line creates a normal (Gaussian) distribution for xmy and theta
 	//normal_distribution<double> dist_x(x, std[0]);
 	//normal_distribution<double> dist_y(y, std[1]);
 	//normal_distribution<double> dist_theta(theta, std[2]);
 
-	for (int i = 0; i < num_particles; ++i) {
+	for (int i = 0; i < num_particles; i++) {
 		// particles[i].x = dist_x(gen);
 		// particles[i].y = dist_y(gen);
 		 particles[i].theta = theta_dist[i]+theta;
